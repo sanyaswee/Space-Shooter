@@ -50,6 +50,10 @@ class Player(GameSprite):
         if self.rect.x + self.rect.width <= 700:
             self.rect.x += self.speed
 
+    def reset(self):
+        """Resets x coordinate"""
+        self.rect.x = 700 // 2
+
 
 class Bullet(GameSprite):
     def move(self, bullets):

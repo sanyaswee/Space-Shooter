@@ -47,6 +47,10 @@ score_counter = 0
 bullets = []
 
 
+lose = False
+game = True
+
+
 def add_ammo():
     """Adds an ammo to the list of bullets"""
     global bullets
@@ -61,23 +65,38 @@ def add_ammo():
     bullets.append(bullet)
 
 
+def reset():
+    """Resets all the game counters and coordinates"""
+    global lose, skip_counter, score_counter, bullets, player, enemies
+    lose = False
+    skip_counter = 0
+    score_counter = 0
+    bullets.clear()
+    player.reset()
+    for ufo in enemies:
+        ufo.move_up()
+
+
 sounds.play_bg()
-lose = False
-game = True
 while game:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game = False
         if SETTINGS['control_type'] == 'k':
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    add_ammo()
+            if not lose:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        add_ammo()
         elif SETTINGS['control_type'] == 'm':
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    add_ammo()
-                    if not lose:
+                if not lose:
+                    if event.button == 1:
+                        add_ammo()
                         sounds.fire.play()
+        if lose:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    reset()
 
     if not lose:
         win.blit(back, (0, 0))
