@@ -30,8 +30,15 @@ class Player(GameSprite):
                 self.move_right()
         elif SETTINGS['control_type'] == 'm':
             mouse = pygame.mouse.get_pos()
-            if self.rect.x in range(0, 700 - self.rect.width):
-                self.rect.x = mouse[0]
+            if self.rect.x > 0 and self.rect.x < 700 - self.rect.width:
+                self.rect.centerx = mouse[0]
+            else:
+                if self.rect.x < 0:
+                    if mouse[0] >= 0 + self.rect.width // 2:
+                        self.rect.centerx = mouse[0]
+                elif self.rect.x >= 700 - self.rect.width:
+                    if mouse[0] <= 700 - self.rect.width:
+                        self.rect.centerx = mouse[0]
 
     def move_left(self):
         """Moves the player left"""

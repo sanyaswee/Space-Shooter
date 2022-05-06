@@ -1,9 +1,12 @@
-import pygame
-import os
-from random import randint
 from classes import Player, Enemy, Bullet
-import saver
 
+import os
+import pygame
+
+from random import randint
+
+import saver
+import sounds
 
 pygame.init()
 
@@ -17,7 +20,7 @@ fps = 60
 SETTINGS = saver.load()['settings']
 
 
-path = os.path.join(os.path.abspath(__file__+'\..'), 'images')
+path = os.path.join(os.path.abspath(__file__ + '\..'), 'images')
 
 
 back = os.path.join(path, 'galaxy.jpg')
@@ -58,6 +61,7 @@ def add_ammo():
     bullets.append(bullet)
 
 
+sounds.play_bg()
 lose = False
 game = True
 while game:
@@ -72,6 +76,8 @@ while game:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     add_ammo()
+                    if not lose:
+                        sounds.fire.play()
 
     if not lose:
         win.blit(back, (0, 0))
