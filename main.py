@@ -22,7 +22,6 @@ back = pygame.transform.scale(back, (700, 500))
 
 
 player = Player(250, 400, 100, 100, pygame.image.load(os.path.join(path, 'rocket.png')), 10)
-player.bullets = []
 
 
 enemies = []
@@ -34,8 +33,11 @@ for i in range(5):
 
 label = pygame.font.SysFont('arial', 25)
 lose_label = pygame.font.SysFont('arial', 48)
+
+
 skip_counter = 0
 score_counter = 0
+bullets = []
 
 
 lose = False
@@ -54,7 +56,7 @@ while game:
                     pygame.image.load(os.path.join(path, 'bullet.png')),
                     25
                 )
-                player.bullets.append(ammo)
+                bullets.append(ammo)
 
     if not lose:
         win.blit(back, (0, 0))
@@ -69,9 +71,9 @@ while game:
                 lose = True
                 win.blit(lose_label.render('Проигрыш', True, (255, 255, 255)), (200, 200))
 
-        for ammo in player.bullets:
+        for ammo in bullets:
             ammo.draw(win)
-            ammo.move(player)
+            ammo.move(bullets)
             for enemy in enemies:
                 if ammo.rect.colliderect(enemy.rect):
                     enemy.move_up()

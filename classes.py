@@ -27,11 +27,11 @@ class Player(GameSprite):
 
 
 class Ammo(GameSprite):
-    def move(self, player):  #TODO create new bullets system
+    def move(self, bullets):
         """Moves an ammo down"""
         self.rect.y -= self.speed
         if self.rect.y <= -30:
-            player.bullets.remove(self)
+            bullets.remove(self)
 
 
 class Enemy(GameSprite):
