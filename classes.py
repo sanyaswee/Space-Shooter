@@ -1,6 +1,10 @@
 import pygame
 from random import randint
+from saver import load
 pygame.init()
+
+
+SETTINGS = load()['settings']
 
 
 class GameSprite:
@@ -17,16 +21,30 @@ class GameSprite:
 class Player(GameSprite):
     def move(self):
         """Moves player left or right"""
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-            if self.rect.x >= 0:
-                self.rect.x -= self.speed
-        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-            if self.rect.x + self.rect.width <= 700:
-                self.rect.x += self.speed
+        global SETTINGS
+        if SETTINGS['control_type'] == 'k':
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_a] or keys[pygame.K_LEFT]:  # left
+                self.move_left()
+            if keys[pygame.K_d] or keys[pygame.K_RIGHT]:  # right
+                self.move_right()
+        elif SETTINGS['control_type'] == 'm':
+            mouse = pygame.mouse.get_pos()
+            if self.rect.x in range(0, 700 - self.rect.width):
+                self.rect.x = mouse[0]
+
+    def move_left(self):
+        """Moves the player left"""
+        if self.rect.x >= 0:
+            self.rect.x -= self.speed
+
+    def move_right(self):
+        """Moves the player right"""
+        if self.rect.x + self.rect.width <= 700:
+            self.rect.x += self.speed
 
 
-class Ammo(GameSprite):
+class Bullet(GameSprite):
     def move(self, bullets):
         """Moves an ammo down"""
         self.rect.y -= self.speed

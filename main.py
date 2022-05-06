@@ -1,7 +1,8 @@
 import pygame
 import os
 from random import randint
-from classes import Player, Enemy, Ammo
+from classes import Player, Enemy, Bullet
+import saver
 
 
 pygame.init()
@@ -11,6 +12,9 @@ win = pygame.display.set_mode((700, 500))
 pygame.display.set_caption('Space Shooter')
 clock = pygame.time.Clock()
 fps = 60
+
+
+SETTINGS = saver.load()['settings']
 
 
 path = os.path.join(os.path.abspath(__file__+'\..'), 'images')
@@ -40,23 +44,34 @@ score_counter = 0
 bullets = []
 
 
+def add_ammo():
+    """Adds an ammo to the list of bullets"""
+    global bullets
+    bullet = Bullet(
+        player.rect.centerx - 12,
+        player.rect.y,
+        25,
+        25,
+        pygame.image.load(os.path.join(path, 'bullet.png')),
+        25
+    )
+    bullets.append(bullet)
+
+
 lose = False
 game = True
 while game:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                ammo = Ammo(
-                    player.rect.centerx-12,
-                    player.rect.y,
-                    25,
-                    25,
-                    pygame.image.load(os.path.join(path, 'bullet.png')),
-                    25
-                )
-                bullets.append(ammo)
+        if SETTINGS['control_type'] == 'k':
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    add_ammo()
+        elif SETTINGS['control_type'] == 'm':
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    add_ammo()
 
     if not lose:
         win.blit(back, (0, 0))
