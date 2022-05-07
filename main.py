@@ -39,6 +39,13 @@ for i in range(5):
         )
 
 
+asteroids = []
+for i in range(1):
+    asteroids.append(
+        Enemy(randint(0, 700), -50, 50, 50, pygame.image.load(os.path.join(path, 'asteroid.png')), randint(1, 3))
+    )
+
+
 # labels
 label = pygame.font.SysFont('impact', 25)
 lose_label = pygame.font.SysFont('impact', 48)
@@ -73,7 +80,7 @@ def add_ammo():
 
 def reset():
     """Resets all the game counters and coordinates"""
-    global lose, skip_counter, beaten_counter, bullets, player, enemies, shot_counter
+    global lose, skip_counter, beaten_counter, bullets, player, enemies, shot_counter, asteroids
     lose = False
     skip_counter = 0
     beaten_counter = 0
@@ -82,6 +89,8 @@ def reset():
     player.reset()
     for ufo in enemies:
         ufo.move_up()
+    for asteroid in asteroids:
+        asteroid.move_up()
 
 
 sounds.play_bg()
@@ -120,14 +129,21 @@ while game:
         )
         player.draw(win)
         player.move()
-        for enemy in enemies:
+        for enemy in enemies:  # enemies` collision
             enemy.draw(win)
             skip_counter = enemy.move(skip_counter)
             if enemy.rect.colliderect(player.rect):
                 lose = True
                 win.blit(lose_label.render('Проигрыш', True, (255, 255, 255)), (200, 200))
 
-        for ammo in bullets:
+        for asteroid in asteroids:  # asteroids` collision
+            asteroid.draw(win)
+            asteroid.move()
+            if asteroid.rect.colliderect(player.rect):
+                lose = True
+                win.blit(lose_label.render('Проигрыш', True, (255, 255, 255)), (200, 200))
+
+        for ammo in bullets:  # bullets` collision
             ammo.draw(win)
             ammo.move(bullets)
             for enemy in enemies:

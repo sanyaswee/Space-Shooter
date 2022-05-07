@@ -64,7 +64,7 @@ class Bullet(GameSprite):
 
 
 class Enemy(GameSprite):
-    def move(self, skip_counter):
+    def move(self, skip_counter=0):
         """Moves an enemy down"""
         self.rect.y += self.speed
         if self.rect.y >= 530:
