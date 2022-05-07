@@ -62,11 +62,20 @@ start_btn = Button(
     200, 100, 6,  # scale
     'Начать', pygame.font.SysFont('impact', 25)  # text
 )
+restart_btn = Button(
+    250, 200,  # coordinates
+    200, 100, 6,  # scale
+    'Заново', pygame.font.SysFont('impact', 25)  # text
+)
+menu_btn = Button(
+    250, 350,  # coordinates
+    200, 100, 6,  # scale
+    'В меню', pygame.font.SysFont('impact', 25)  # text
+)
 
 
 # labels
 label = pygame.font.SysFont('impact', 25)
-lose_label = pygame.font.SysFont('impact', 48)
 labels_wide = 28
 label_start_cor = 12
 
@@ -113,13 +122,17 @@ def reset():
         asteroid.move_up()
 
 
-win.blit(back, (0, 0))
 sounds.play_bg()
 while loop:  # main loop
+    win.blit(back, (0, 0))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             loop = False
             game = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                if start_btn.check_collision():
+                    game = True
 
     start_btn.draw(win)
 
@@ -137,15 +150,16 @@ while loop:  # main loop
                             sounds.fire.play()
             elif SETTINGS['control_type'] == 'm':
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if not lose:
-                        if event.button == 1:
+                    if event.button == 1:
+                        if not lose:
                             add_ammo()
                             shot_counter += 1
                             sounds.fire.play()
-            if lose:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        reset()
+                        else:
+                            if restart_btn.check_collision():
+                                reset()
+                            elif menu_btn.check_collision():
+                                game = False
 
         if not lose:
             win.blit(back, (0, 0))
@@ -168,14 +182,12 @@ while loop:  # main loop
                 skip_counter = enemy.move(skip_counter)
                 if enemy.rect.colliderect(player.rect):
                     lose = True
-                    win.blit(lose_label.render('Проигрыш', True, (255, 255, 255)), (200, 200))
 
             for asteroid in asteroids:  # asteroids` collision
                 asteroid.draw(win)
                 asteroid.move()
                 if asteroid.rect.colliderect(player.rect):
                     lose = True
-                    win.blit(lose_label.render('Проигрыш', True, (255, 255, 255)), (200, 200))
 
             for ammo in bullets:  # bullets` collision
                 ammo.draw(win)
@@ -184,6 +196,9 @@ while loop:  # main loop
                     if ammo.rect.colliderect(enemy.rect):
                         enemy.move_up()
                         beaten_counter += 1
+        else:
+            restart_btn.draw(win)
+            menu_btn.draw(win)
 
         pygame.display.update()
         clock.tick(FPS)

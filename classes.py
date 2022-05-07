@@ -34,7 +34,7 @@ class Player(GameSprite):
             if self.rect.x > 0 and self.rect.x < 700 - self.rect.width:
                 self.rect.centerx = mouse[0]
             else:
-                if self.rect.x < 0:
+                if self.rect.x <= 0:
                     if mouse[0] >= 0 + self.rect.width // 2:
                         self.rect.centerx = mouse[0]
                 elif self.rect.x >= 700 - self.rect.width:
