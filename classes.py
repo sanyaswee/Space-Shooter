@@ -83,9 +83,9 @@ class Button:
     def __init__(
             self,
             x: int, y: int,  # coordinates
-            width: int, height: int,  # scale
+            width: int, height: int, border_width: int,  # scale
             text: str, font: pygame.font.SysFont,  # text & font
-            inactive_color=c.YELLOW, active_color=c.GREEN, text_color=c.BLACK  # color
+            inactive_color=c.YELLOW, active_color=c.GREEN, text_color=c.BLACK, border_color=c.BLACK  # colors
     ):
         self.rect = pygame.Rect(x, y, width, height)
         self.inactive_color = inactive_color
@@ -93,7 +93,37 @@ class Button:
         self.font = font
         self.text = text
         self.text_color = text_color
+        self.border_color = border_color
+        self.border_width = border_width
 
     def draw(self, win: pygame.Surface):
         """Draws the button"""
-        pygame.draw.rect(win, self.inactive_color, self.rect)
+        if not self.check_collision():
+            pygame.draw.rect(win, self.inactive_color, self.rect)
+        else:
+            pygame.draw.rect(win, self.active_color, self.rect)
+        pygame.draw.rect(win, self.border_color, self.rect, self.border_width)
+        rendered = self.font.render(self.text, True, self.text_color)
+        text_rect = rendered.get_rect()
+        text_rect.centerx = self.rect.centerx
+        text_rect.centery = self.rect.centery
+        win.blit(rendered, (text_rect.x, text_rect.y))
+
+    def check_collision(self):
+        """Checks collision with mouse"""
+        mouse = pygame.mouse.get_pos()
+        # checking x-collision
+        if mouse[0] in range(self.rect.x, self.rect.x + self.rect.width):
+            x_collision = True
+        else:
+            x_collision = False
+        # checking y-collision
+        if mouse[1] in range(self.rect.y, self.rect.y + self.rect.height):
+            y_collision = True
+        else:
+            y_collision = False
+        # checking total collision
+        if x_collision and y_collision:
+            return True
+        else:
+            return False

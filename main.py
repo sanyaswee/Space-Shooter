@@ -15,7 +15,7 @@ pygame.init()
 win = pygame.display.set_mode((700, 500))
 pygame.display.set_caption('Space Shooter')
 clock = pygame.time.Clock()
-fps = 60
+FPS = 60
 
 
 SETTINGS = saver.load()['settings']
@@ -56,6 +56,14 @@ for i in range(SETTINGS['hardness']):
     )
 
 
+# buttons
+start_btn = Button(
+    250, 200,  # coordinates
+    200, 100, 6,  # scale
+    'Начать', pygame.font.SysFont('impact', 25)  # text
+)
+
+
 # labels
 label = pygame.font.SysFont('impact', 25)
 lose_label = pygame.font.SysFont('impact', 48)
@@ -72,7 +80,8 @@ bullets = []
 
 # flags
 lose = False
-game = True
+loop = True
+game = False
 
 
 def add_ammo():
@@ -104,67 +113,80 @@ def reset():
         asteroid.move_up()
 
 
+win.blit(back, (0, 0))
 sounds.play_bg()
-while game:
+while loop:  # main loop
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            loop = False
             game = False
-        if SETTINGS['control_type'] == 'k':
-            if not lose:
+
+    start_btn.draw(win)
+
+    while game:  # game loop
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                loop = False
+                game = False
+            if SETTINGS['control_type'] == 'k':
+                if not lose:
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_SPACE:
+                            add_ammo()
+                            shot_counter += 1
+                            sounds.fire.play()
+            elif SETTINGS['control_type'] == 'm':
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if not lose:
+                        if event.button == 1:
+                            add_ammo()
+                            shot_counter += 1
+                            sounds.fire.play()
+            if lose:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        add_ammo()
-                        shot_counter += 1
-                        sounds.fire.play()
-        elif SETTINGS['control_type'] == 'm':
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if not lose:
-                    if event.button == 1:
-                        add_ammo()
-                        shot_counter += 1
-                        sounds.fire.play()
-        if lose:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    reset()
+                        reset()
 
-    if not lose:
-        win.blit(back, (0, 0))
+        if not lose:
+            win.blit(back, (0, 0))
 
-        # formula for labels` y-cor is: start coordinate + wide between labels * (number of label - 1)
-        win.blit(label.render(f'Пропущено: {skip_counter}', True, c.WHITE), (5, label_start_cor + labels_wide))
-        win.blit(label.render(f'Cбито: {beaten_counter}', True, c.WHITE), (5, label_start_cor + labels_wide * 3))
-        win.blit(label.render(
-            f'Выстрелы: {shot_counter}', True, c.WHITE), (5, label_start_cor + labels_wide * 2)
-        )
-        win.blit(label.render(
-            f'Счет: {beaten_counter * 3 - skip_counter - shot_counter}', True, c.WHITE), (5, label_start_cor)
-        )
+            # formula for labels` y-cor is: start coordinate + wide between labels * (number of label - 1)
+            win.blit(label.render(f'Пропущено: {skip_counter}', True, c.WHITE), (5, label_start_cor + labels_wide))
+            win.blit(label.render(f'Cбито: {beaten_counter}', True, c.WHITE), (5, label_start_cor + labels_wide * 3))
+            win.blit(label.render(
+                f'Выстрелы: {shot_counter}', True, c.WHITE), (5, label_start_cor + labels_wide * 2)
+            )
+            win.blit(label.render(
+                f'Счет: {beaten_counter * 3 - skip_counter - shot_counter}', True, c.WHITE), (5, label_start_cor)
+            )
 
-        player.draw(win)
-        player.move()
+            player.draw(win)
+            player.move()
 
-        for enemy in enemies:  # enemies` collision
-            enemy.draw(win)
-            skip_counter = enemy.move(skip_counter)
-            if enemy.rect.colliderect(player.rect):
-                lose = True
-                win.blit(lose_label.render('Проигрыш', True, (255, 255, 255)), (200, 200))
+            for enemy in enemies:  # enemies` collision
+                enemy.draw(win)
+                skip_counter = enemy.move(skip_counter)
+                if enemy.rect.colliderect(player.rect):
+                    lose = True
+                    win.blit(lose_label.render('Проигрыш', True, (255, 255, 255)), (200, 200))
 
-        for asteroid in asteroids:  # asteroids` collision
-            asteroid.draw(win)
-            asteroid.move()
-            if asteroid.rect.colliderect(player.rect):
-                lose = True
-                win.blit(lose_label.render('Проигрыш', True, (255, 255, 255)), (200, 200))
+            for asteroid in asteroids:  # asteroids` collision
+                asteroid.draw(win)
+                asteroid.move()
+                if asteroid.rect.colliderect(player.rect):
+                    lose = True
+                    win.blit(lose_label.render('Проигрыш', True, (255, 255, 255)), (200, 200))
 
-        for ammo in bullets:  # bullets` collision
-            ammo.draw(win)
-            ammo.move(bullets)
-            for enemy in enemies:
-                if ammo.rect.colliderect(enemy.rect):
-                    enemy.move_up()
-                    beaten_counter += 1
+            for ammo in bullets:  # bullets` collision
+                ammo.draw(win)
+                ammo.move(bullets)
+                for enemy in enemies:
+                    if ammo.rect.colliderect(enemy.rect):
+                        enemy.move_up()
+                        beaten_counter += 1
+
+        pygame.display.update()
+        clock.tick(FPS)
 
     pygame.display.update()
-    clock.tick(fps)
+    clock.tick(FPS)
