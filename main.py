@@ -18,6 +18,8 @@ fps = 60
 
 
 SETTINGS = saver.load()['settings']
+
+
 WHITE = pygame.Color('white')
 
 
@@ -35,14 +37,24 @@ player = Player(250, 400, 100, 100, pygame.image.load(os.path.join(path, 'rocket
 enemies = []
 for i in range(5):
     enemies.append(
-        Enemy(randint(0, 700), -50, 50, 50, pygame.image.load(os.path.join(path, 'ufo.png')), randint(1, 6))
+        Enemy(
+            randint(0, 700), -50,  # coordinates
+            50, 50,  # scale
+            pygame.image.load(os.path.join(path, 'ufo.png')),  # image
+            randint(1, SETTINGS['hardness'] * 4)  # speed
         )
+    )
 
 
 asteroids = []
-for i in range(1):
+for i in range(SETTINGS['hardness']):
     asteroids.append(
-        Enemy(randint(0, 700), -50, 50, 50, pygame.image.load(os.path.join(path, 'asteroid.png')), randint(1, 3))
+        Enemy(
+            randint(0, 700), -50,  # coordinates
+            50, 50,  # scale
+            pygame.image.load(os.path.join(path, 'asteroid.png')),  # image
+            randint(1, SETTINGS['hardness'] + 1)  # speed
+        )
     )
 
 
@@ -60,6 +72,7 @@ shot_counter = 0
 bullets = []
 
 
+# flags
 lose = False
 game = True
 
@@ -119,6 +132,8 @@ while game:
 
     if not lose:
         win.blit(back, (0, 0))
+
+        # formula for labels` y-cor is: start coordinate + wide between labels * (number of label - 1)
         win.blit(label.render(f'Пропущено: {skip_counter}', True, WHITE), (5, label_start_cor + labels_wide))
         win.blit(label.render(f'Cбито: {beaten_counter}', True, WHITE), (5, label_start_cor + labels_wide * 3))
         win.blit(label.render(
@@ -127,8 +142,10 @@ while game:
         win.blit(label.render(
             f'Счет: {beaten_counter * 3 - skip_counter - shot_counter}', True, WHITE), (5, label_start_cor)
         )
+
         player.draw(win)
         player.move()
+
         for enemy in enemies:  # enemies` collision
             enemy.draw(win)
             skip_counter = enemy.move(skip_counter)
