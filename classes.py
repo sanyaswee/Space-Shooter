@@ -1,3 +1,4 @@
+import colors as c
 import pygame
 from random import randint
 from saver import load
@@ -8,12 +9,12 @@ SETTINGS = load()['settings']
 
 
 class GameSprite:
-    def __init__(self, x, y, width, height, image, speed):
+    def __init__(self, x: int, y: int, width: int, height: int, image: pygame.Surface, speed: int):
         self.rect = pygame.Rect(x, y, width, height)
         self.image = pygame.transform.scale(image, (width, height))
         self.speed = speed
 
-    def draw(self, win):
+    def draw(self, win: pygame.Surface):
         """Shows the sprite in the screen"""
         win.blit(self.image, (self.rect.x, self.rect.y))
 
@@ -56,7 +57,7 @@ class Player(GameSprite):
 
 
 class Bullet(GameSprite):
-    def move(self, bullets):
+    def move(self, bullets: list):
         """Moves an ammo down"""
         self.rect.y -= self.speed
         if self.rect.y <= -30:
@@ -76,3 +77,23 @@ class Enemy(GameSprite):
         """TPs enemy back on the top"""
         self.rect.y = -50
         self.rect.x = randint(0, 700-self.rect.width)
+
+
+class Button:
+    def __init__(
+            self,
+            x: int, y: int,  # coordinates
+            width: int, height: int,  # scale
+            text: str, font: pygame.font.SysFont,  # text & font
+            inactive_color=c.YELLOW, active_color=c.GREEN, text_color=c.BLACK  # color
+    ):
+        self.rect = pygame.Rect(x, y, width, height)
+        self.inactive_color = inactive_color
+        self.active_color = active_color
+        self.font = font
+        self.text = text
+        self.text_color = text_color
+
+    def draw(self, win: pygame.Surface):
+        """Draws the button"""
+        pygame.draw.rect(win, self.inactive_color, self.rect)

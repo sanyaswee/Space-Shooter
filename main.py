@@ -1,5 +1,6 @@
-from classes import Player, Enemy, Bullet
+from classes import Player, Enemy, Bullet, Button
 
+import colors as c
 import os
 import pygame
 
@@ -18,9 +19,6 @@ fps = 60
 
 
 SETTINGS = saver.load()['settings']
-
-
-WHITE = pygame.Color('white')
 
 
 path = os.path.join(os.path.abspath(__file__ + '\..'), 'images')
@@ -134,13 +132,13 @@ while game:
         win.blit(back, (0, 0))
 
         # formula for labels` y-cor is: start coordinate + wide between labels * (number of label - 1)
-        win.blit(label.render(f'Пропущено: {skip_counter}', True, WHITE), (5, label_start_cor + labels_wide))
-        win.blit(label.render(f'Cбито: {beaten_counter}', True, WHITE), (5, label_start_cor + labels_wide * 3))
+        win.blit(label.render(f'Пропущено: {skip_counter}', True, c.WHITE), (5, label_start_cor + labels_wide))
+        win.blit(label.render(f'Cбито: {beaten_counter}', True, c.WHITE), (5, label_start_cor + labels_wide * 3))
         win.blit(label.render(
-            f'Выстрелы: {shot_counter}', True, WHITE), (5, label_start_cor + labels_wide * 2)
+            f'Выстрелы: {shot_counter}', True, c.WHITE), (5, label_start_cor + labels_wide * 2)
         )
         win.blit(label.render(
-            f'Счет: {beaten_counter * 3 - skip_counter - shot_counter}', True, WHITE), (5, label_start_cor)
+            f'Счет: {beaten_counter * 3 - skip_counter - shot_counter}', True, c.WHITE), (5, label_start_cor)
         )
 
         player.draw(win)
