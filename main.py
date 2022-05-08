@@ -26,7 +26,7 @@ SETTINGS = PARAMS['settings']
 LANG_Q = ['EN', 'UA', 'RU']
 
 
-path = os.path.join(os.path.abspath(__file__ + '\..'), 'images')
+path = os.path.join(os.getcwd(), 'images')
 
 
 back = os.path.join(path, 'galaxy.jpg')

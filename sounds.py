@@ -4,7 +4,7 @@ import pygame
 pygame.mixer.init()
 
 
-path = os.path.join(os.path.abspath(__file__+'\..'), 'sounds')
+path = os.path.join(os.getcwd(), 'sounds')
 
 
 # bg music
