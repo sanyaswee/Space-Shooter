@@ -1,6 +1,9 @@
 from classes import Player, Enemy, Bullet, Button
 
 import colors as c
+
+import dictionary as d
+
 import os
 import pygame
 
@@ -18,7 +21,9 @@ clock = pygame.time.Clock()
 FPS = 60
 
 
-SETTINGS = saver.load()['settings']
+PARAMS = saver.load()
+SETTINGS = PARAMS['settings']
+LANG_Q = ['EN', 'UA', 'RU']
 
 
 path = os.path.join(os.path.abspath(__file__ + '\..'), 'images')
@@ -60,17 +65,22 @@ for i in range(SETTINGS['hardness']):
 start_btn = Button(
     250, 200,  # coordinates
     200, 100, 6,  # scale
-    'Начать', pygame.font.SysFont('impact', 25)  # text
+    d.START[SETTINGS['language']].title(), pygame.font.SysFont('impact', 25)  # text
 )
 restart_btn = Button(
     250, 200,  # coordinates
     200, 100, 6,  # scale
-    'Заново', pygame.font.SysFont('impact', 25)  # text
+    d.RESTART[SETTINGS['language']].title(), pygame.font.SysFont('impact', 25)  # text
 )
 menu_btn = Button(
     250, 350,  # coordinates
     200, 100, 6,  # scale
-    'В меню', pygame.font.SysFont('impact', 25)  # text
+    d.TO_MENU[SETTINGS['language']].title(), pygame.font.SysFont('impact', 25)  # text
+)
+change_lang_btn = Button(
+    25, 400,  # coordinates
+    150, 75, 5,  # scale
+    d.LANGUAGE[SETTINGS['language']].title(), pygame.font.SysFont('impact', 16)  # text
 )
 
 
@@ -122,6 +132,27 @@ def reset():
         asteroid.move_up()
 
 
+def change_lng():
+    """Changes language"""
+    global SETTINGS, LANG_Q, PARAMS
+    cur_index = LANG_Q.index(SETTINGS['language'])
+    if cur_index >= len(LANG_Q):
+        cur_index = 0
+    SETTINGS['language'] = LANG_Q[cur_index]
+    PARAMS['settings'] = SETTINGS
+    saver.save(PARAMS)
+    redefine()
+
+
+def redefine():
+    """Redefines all the buttons"""
+    global change_lang_btn, menu_btn, start_btn, restart_btn
+    change_lang_btn.text = d.LANGUAGE[SETTINGS['language']].title()
+    menu_btn.text = d.TO_MENU[SETTINGS['language']].title()
+    start_btn.text = d.START[SETTINGS['language']].title()
+    restart_btn.text = d.RESTART[SETTINGS['language']].title()
+
+
 sounds.play_bg()
 while loop:  # main loop
     win.blit(back, (0, 0))
@@ -133,8 +164,11 @@ while loop:  # main loop
             if event.button == 1:
                 if start_btn.check_collision():
                     game = True
+                elif change_lang_btn.check_collision():
+                    change_lng()
 
     start_btn.draw(win)
+    change_lang_btn.draw(win)
 
     while game:  # game loop
         for event in pygame.event.get():
@@ -165,13 +199,13 @@ while loop:  # main loop
             win.blit(back, (0, 0))
 
             # formula for labels` y-cor is: start coordinate + wide between labels * (number of label - 1)
-            win.blit(label.render(f'Пропущено: {skip_counter}', True, c.WHITE), (5, label_start_cor + labels_wide))
-            win.blit(label.render(f'Cбито: {beaten_counter}', True, c.WHITE), (5, label_start_cor + labels_wide * 3))
+            win.blit(label.render(f'{d.SKIPPED[SETTINGS["language"]].title()}: {skip_counter}', True, c.WHITE), (5, label_start_cor + labels_wide))
+            win.blit(label.render(f'{d.BEATEN[SETTINGS["language"]].title()}: {beaten_counter}', True, c.WHITE), (5, label_start_cor + labels_wide * 3))
             win.blit(label.render(
-                f'Выстрелы: {shot_counter}', True, c.WHITE), (5, label_start_cor + labels_wide * 2)
+                f'{d.SHOTS[SETTINGS["language"]].title()}: {shot_counter}', True, c.WHITE), (5, label_start_cor + labels_wide * 2)
             )
             win.blit(label.render(
-                f'Счет: {beaten_counter * 3 - skip_counter - shot_counter}', True, c.WHITE), (5, label_start_cor)
+                f'{d.SCORE[SETTINGS["language"]].title()}: {beaten_counter * 3 - skip_counter - shot_counter}', True, c.WHITE), (5, label_start_cor)
             )
 
             player.draw(win)

@@ -31,5 +31,10 @@ BEATEN = {
 SHOTS = {
     'EN': 'shots',
     'UA': 'пострілів',
-    'RU': 'заново'
+    'RU': 'выстрелов'
+}
+LANGUAGE = {
+    'EN': 'language: english',
+    'UA': 'мова: українська',
+    'RU': 'язык: русский'
 }
