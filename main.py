@@ -1,4 +1,4 @@
-from classes import Player, Enemy, Bullet, Button
+from classes import Player, Enemy, Bullet, Button, update_settings
 
 import colors as c
 
@@ -13,6 +13,82 @@ import saver
 import sounds
 
 pygame.init()
+
+
+# functions
+def add_ammo():
+    """Adds an ammo to the list of bullets"""
+    global bullets
+    bullet = Bullet(
+        player.rect.centerx - 12,
+        player.rect.y,
+        25,
+        25,
+        pygame.image.load(os.path.join(path, 'bullet.png')),
+        25
+    )
+    bullets.append(bullet)
+
+
+def reset():
+    """Resets all the game counters and coordinates"""
+    global lose, skip_counter, beaten_counter, bullets, player, enemies, shot_counter, asteroids
+    lose = False
+    skip_counter = 0
+    beaten_counter = 0
+    shot_counter = 0
+    bullets.clear()
+    player.reset()
+    for ufo in enemies:
+        ufo.move_up()
+    for asteroid in asteroids:
+        asteroid.move_up()
+
+
+def change_lng():
+    """Changes language"""
+    global SETTINGS, LANG_Q, PARAMS
+    cur_index = LANG_Q.index(SETTINGS['language'])
+    if cur_index == len(LANG_Q) - 1:
+        cur_index = 0
+    else:
+        cur_index += 1
+    SETTINGS['language'] = LANG_Q[cur_index]
+    PARAMS['settings'] = SETTINGS
+    saver.save(PARAMS)
+    redefine()
+
+
+def redefine():
+    """Redefines all the buttons"""
+    global change_lang_btn, menu_btn, start_btn, restart_btn, change_ct_btn
+    change_lang_btn.text = d.LANGUAGE[SETTINGS['language']].title()
+    menu_btn.text = d.TO_MENU[SETTINGS['language']].title()
+    start_btn.text = d.START[SETTINGS['language']].title()
+    restart_btn.text = d.RESTART[SETTINGS['language']].title()
+    change_ct_btn.text = f'{d.CONTROL_TYPE[SETTINGS["language"]].title()}: {get_ct().title()}'
+    update_settings()
+
+
+def get_ct():
+    """Returns right translation of control type"""
+    global SETTINGS
+    if SETTINGS['control_type'] == 'k':
+        return d.KEYBOARD[SETTINGS['language']]
+    else:
+        return d.MOUSE[SETTINGS['language']]
+
+
+def change_ct():
+    """Changes control type"""
+    global SETTINGS, PARAMS
+    if SETTINGS['control_type'] == 'm':
+        SETTINGS['control_type'] = 'k'
+    else:
+        SETTINGS['control_type'] = 'm'
+    PARAMS['settings'] = SETTINGS
+    saver.save(PARAMS)
+    redefine()
 
 
 win = pygame.display.set_mode((700, 500))
@@ -82,6 +158,11 @@ change_lang_btn = Button(
     150, 75, 5,  # scale
     d.LANGUAGE[SETTINGS['language']].title(), pygame.font.SysFont('impact', 16)  # text
 )
+change_ct_btn = Button(
+    525, 400,  # coordinates
+    150, 75, 5,  # scale
+    f'{d.CONTROL_TYPE[SETTINGS["language"]].title()}: {get_ct().title()}', pygame.font.SysFont('impact', 13)  # text
+)
 
 
 # labels
@@ -103,58 +184,6 @@ loop = True
 game = False
 
 
-def add_ammo():
-    """Adds an ammo to the list of bullets"""
-    global bullets
-    bullet = Bullet(
-        player.rect.centerx - 12,
-        player.rect.y,
-        25,
-        25,
-        pygame.image.load(os.path.join(path, 'bullet.png')),
-        25
-    )
-    bullets.append(bullet)
-
-
-def reset():
-    """Resets all the game counters and coordinates"""
-    global lose, skip_counter, beaten_counter, bullets, player, enemies, shot_counter, asteroids
-    lose = False
-    skip_counter = 0
-    beaten_counter = 0
-    shot_counter = 0
-    bullets.clear()
-    player.reset()
-    for ufo in enemies:
-        ufo.move_up()
-    for asteroid in asteroids:
-        asteroid.move_up()
-
-
-def change_lng():
-    """Changes language"""
-    global SETTINGS, LANG_Q, PARAMS
-    cur_index = LANG_Q.index(SETTINGS['language'])
-    if cur_index == len(LANG_Q) - 1:
-        cur_index = 0
-    else:
-        cur_index += 1
-    SETTINGS['language'] = LANG_Q[cur_index]
-    PARAMS['settings'] = SETTINGS
-    saver.save(PARAMS)
-    redefine()
-
-
-def redefine():
-    """Redefines all the buttons"""
-    global change_lang_btn, menu_btn, start_btn, restart_btn
-    change_lang_btn.text = d.LANGUAGE[SETTINGS['language']].title()
-    menu_btn.text = d.TO_MENU[SETTINGS['language']].title()
-    start_btn.text = d.START[SETTINGS['language']].title()
-    restart_btn.text = d.RESTART[SETTINGS['language']].title()
-
-
 sounds.play_bg()
 while loop:  # main loop
     win.blit(back, (0, 0))
@@ -166,11 +195,15 @@ while loop:  # main loop
             if event.button == 1:
                 if start_btn.check_collision():
                     game = True
+                    reset()
                 elif change_lang_btn.check_collision():
                     change_lng()
+                elif change_ct_btn.check_collision():
+                    change_ct()
 
     start_btn.draw(win)
     change_lang_btn.draw(win)
+    change_ct_btn.draw(win)
 
     while game:  # game loop
         for event in pygame.event.get():
@@ -184,23 +217,23 @@ while loop:  # main loop
                             add_ammo()
                             shot_counter += 1
                             sounds.fire.play()
-            elif SETTINGS['control_type'] == 'm':
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.button == 1:
-                        if not lose:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    if not lose:
+                        if SETTINGS['control_type'] == 'm':
                             add_ammo()
                             shot_counter += 1
                             sounds.fire.play()
-                        else:
-                            if restart_btn.check_collision():
-                                reset()
-                            elif menu_btn.check_collision():
-                                game = False
+                    else:
+                        if restart_btn.check_collision():
+                            reset()
+                        elif menu_btn.check_collision():
+                            game = False
 
         if not lose:
             win.blit(back, (0, 0))
 
-            # formula for labels` y-cor is: start coordinate + wide between labels * (number of label - 1)
+            # formula for labels' y-cor is: start coordinate + wide between labels * (number of label - 1)
             win.blit(label.render(f'{d.SKIPPED[SETTINGS["language"]].title()}: {skip_counter}', True, c.WHITE), (5, label_start_cor + labels_wide))
             win.blit(label.render(f'{d.BEATEN[SETTINGS["language"]].title()}: {beaten_counter}', True, c.WHITE), (5, label_start_cor + labels_wide * 3))
             win.blit(label.render(
@@ -213,19 +246,19 @@ while loop:  # main loop
             player.draw(win)
             player.move()
 
-            for enemy in enemies:  # enemies` collision
+            for enemy in enemies:  # enemies' collision
                 enemy.draw(win)
                 skip_counter = enemy.move(skip_counter)
                 if enemy.rect.colliderect(player.rect):
                     lose = True
 
-            for asteroid in asteroids:  # asteroids` collision
+            for asteroid in asteroids:  # asteroids' collision
                 asteroid.draw(win)
                 asteroid.move()
                 if asteroid.rect.colliderect(player.rect):
                     lose = True
 
-            for ammo in bullets:  # bullets` collision
+            for ammo in bullets:  # bullets' collision
                 ammo.draw(win)
                 ammo.move(bullets)
                 for enemy in enemies:

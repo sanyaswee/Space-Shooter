@@ -6,6 +6,10 @@ pygame.init()
 
 
 SETTINGS = load()['settings']
+def update_settings():
+    """Reloads settings"""
+    global SETTINGS
+    SETTINGS = load()['settings']
 
 
 class GameSprite:
