@@ -239,12 +239,31 @@ while loop:  # main loop
             win.blit(label.render(
                 f'{d.SHOTS[SETTINGS["language"]].title()}: {shot_counter}', True, c.WHITE), (5, label_start_cor + labels_wide * 2)
             )
+            score = beaten_counter * 3 - skip_counter - shot_counter
             win.blit(label.render(
-                f'{d.SCORE[SETTINGS["language"]].title()}: {beaten_counter * 3 - skip_counter - shot_counter}', True, c.WHITE), (5, label_start_cor)
+                f'{d.SCORE[SETTINGS["language"]].title()}: {score}', True, c.WHITE), (5, label_start_cor)
             )
 
             player.draw(win)
             player.move()
+
+            # saving best score
+            if score > PARAMS['best_score']['total']:  # total
+                PARAMS['best_score']['total'] = score
+                saver.save(PARAMS)
+
+            if SETTINGS['hardness'] == 1:  # easy
+                if score > PARAMS['best_score']['easy']:
+                    PARAMS['best_score']['easy'] = score
+                    saver.save(PARAMS)
+            elif SETTINGS['hardness'] == 2:  # medium
+                if score > PARAMS['best_score']['medium']:
+                    PARAMS['best_score']['medium'] = score
+                    saver.save(PARAMS)
+            else:  # hard
+                if score > PARAMS['best_score']['hard']:  # total
+                    PARAMS['best_score']['hard'] = score
+                    saver.save(PARAMS)
 
             for enemy in enemies:  # enemies' collision
                 enemy.draw(win)

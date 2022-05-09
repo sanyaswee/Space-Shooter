@@ -17,7 +17,12 @@ def load(filename=FILENAME):
             data = json.load(file)
     except FileNotFoundError:
         data = {
-            'best_score': 0,
+            'best_score': {
+                'total': 0,
+                'easy': 0,
+                'medium': 0,
+                'hard': 0
+            },
             'settings': {
                 'hardness': 1,
                 'control_type': 'm',
