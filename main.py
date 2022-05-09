@@ -136,8 +136,10 @@ def change_lng():
     """Changes language"""
     global SETTINGS, LANG_Q, PARAMS
     cur_index = LANG_Q.index(SETTINGS['language'])
-    if cur_index >= len(LANG_Q):
+    if cur_index == len(LANG_Q) - 1:
         cur_index = 0
+    else:
+        cur_index += 1
     SETTINGS['language'] = LANG_Q[cur_index]
     PARAMS['settings'] = SETTINGS
     saver.save(PARAMS)
