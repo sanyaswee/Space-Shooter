@@ -129,6 +129,7 @@ def change_hardness():
 
 win = pygame.display.set_mode((700, 500))
 pygame.display.set_caption('Space Shooter')
+pygame.display.set_icon(pygame.image.load(r'images\asteroid.png'))
 clock = pygame.time.Clock()
 FPS = 60
 
