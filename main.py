@@ -61,12 +61,14 @@ def change_lng():
 
 def redefine():
     """Redefines all the buttons"""
-    global change_lang_btn, menu_btn, start_btn, restart_btn, change_ct_btn
+    global change_lang_btn, menu_btn, start_btn, restart_btn, change_ct_btn, change_hardness_btn
     change_lang_btn.text = d.LANGUAGE[SETTINGS['language']].title()
     menu_btn.text = d.TO_MENU[SETTINGS['language']].title()
     start_btn.text = d.START[SETTINGS['language']].title()
     restart_btn.text = d.RESTART[SETTINGS['language']].title()
     change_ct_btn.text = f'{d.CONTROL_TYPE[SETTINGS["language"]].title()}: {get_ct().title()}'
+    change_hardness_btn.text = f'{d.HARDNESS[SETTINGS["language"]].title()}: {get_hardness()}'
+    change_hardness_btn.text_color = get_hardness_color()
     update_settings()
 
 
@@ -89,6 +91,39 @@ def change_ct():
     PARAMS['settings'] = SETTINGS
     saver.save(PARAMS)
     redefine()
+
+
+def get_hardness():
+    """Returns text of required hardness"""
+    global SETTINGS
+    if SETTINGS['hardness'] == 1:  # easy
+        return d.EASY[SETTINGS['language']]
+    elif SETTINGS['hardness'] == 2:  # medium
+        return d.MEDIUM[SETTINGS['language']]
+    else:  # hard
+        return d.HARD[SETTINGS['language']]
+
+
+def get_hardness_color():
+    """Returns color of the text for each hardness"""
+    global SETTINGS
+    if SETTINGS['hardness'] == 1:  # easy
+        return c.DARK_GREEN
+    elif SETTINGS['hardness'] == 2:  # medium
+        return c.ORANGE
+    else:  # hard
+        return c.RED
+
+def change_hardness():
+    """Changes hardness"""
+    global SETTINGS
+    if SETTINGS['hardness'] >= 3:
+        SETTINGS['hardness'] = 1
+    else:
+        SETTINGS['hardness'] += 1
+    PARAMS['settings'] = SETTINGS
+    redefine()
+    saver.save(PARAMS)
 
 
 win = pygame.display.set_mode((700, 500))
@@ -163,6 +198,12 @@ change_ct_btn = Button(
     150, 75, 5,  # scale
     f'{d.CONTROL_TYPE[SETTINGS["language"]].title()}: {get_ct().title()}', pygame.font.SysFont('impact', 13)  # text
 )
+change_hardness_btn = Button(
+    250, 350,  # coordinates
+    200, 100, 6,  # scale
+    f'{d.HARDNESS[SETTINGS["language"]].title()}: {get_hardness()}', pygame.font.SysFont('impact', 20),  # text
+    text_color=get_hardness_color()
+)
 
 
 # labels
@@ -203,11 +244,14 @@ while loop:  # main loop
                     change_lng()
                 elif change_ct_btn.check_collision():
                     change_ct()
+                elif change_hardness_btn.check_collision():
+                    change_hardness()
 
     # buttons
     start_btn.draw(win)
     change_lang_btn.draw(win)
     change_ct_btn.draw(win)
+    change_hardness_btn.draw(win)
 
     # labels
     win.blit(
@@ -224,7 +268,7 @@ while loop:  # main loop
         bsl_diff_hardness.render(
             f'{d.BS_EASY[SETTINGS["language"]].title()}: {PARAMS["best_score"]["easy"]}', True, c.GREEN
         ),
-        (400, 75)
+        (380, 75)
     )
     win.blit(
         bsl_diff_hardness.render(
@@ -236,7 +280,7 @@ while loop:  # main loop
         bsl_diff_hardness.render(
             f'{d.BS_HARD[SETTINGS["language"]].title()}: {PARAMS["best_score"]["hard"]}', True, c.RED
         ),
-        (400, 125)
+        (380, 125)
     )
 
     while game:  # game loop
@@ -303,7 +347,7 @@ while loop:  # main loop
                     PARAMS['best_score']['medium'] = score
                     saver.save(PARAMS)
             else:  # hard
-                if score > PARAMS['best_score']['hard']:  # total
+                if score > PARAMS['best_score']['hard']:  # hard
                     PARAMS['best_score']['hard'] = score
                     saver.save(PARAMS)
 
