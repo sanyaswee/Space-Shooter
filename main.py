@@ -166,9 +166,12 @@ change_ct_btn = Button(
 
 
 # labels
-label = pygame.font.SysFont('impact', 25)
-labels_wide = 28
-label_start_cor = 12
+game_info_label = pygame.font.SysFont('impact', 25)  # game info label ==> gil
+gil_wide = 28
+gil_start_cor = 12
+
+best_score_label = pygame.font.SysFont('impact', 36)  # best score label ==> bsl
+bsl_diff_hardness = pygame.font.SysFont('impact', 30)
 
 
 # counters
@@ -201,9 +204,40 @@ while loop:  # main loop
                 elif change_ct_btn.check_collision():
                     change_ct()
 
+    # buttons
     start_btn.draw(win)
     change_lang_btn.draw(win)
     change_ct_btn.draw(win)
+
+    # labels
+    win.blit(
+        best_score_label.render(d.BEST_SCORE[SETTINGS['language']].title(), True, c.WHITE),
+        (225, 25)
+    )
+    win.blit(
+        bsl_diff_hardness.render(
+            f'{d.TOTAL[SETTINGS["language"]].title()}: {PARAMS["best_score"]["total"]}', True, c.WHITE
+        ),
+        (25, 75)
+    )
+    win.blit(
+        bsl_diff_hardness.render(
+            f'{d.BS_EASY[SETTINGS["language"]].title()}: {PARAMS["best_score"]["easy"]}', True, c.GREEN
+        ),
+        (400, 75)
+    )
+    win.blit(
+        bsl_diff_hardness.render(
+            f'{d.BS_MEDIUM[SETTINGS["language"]].title()}: {PARAMS["best_score"]["medium"]}', True, c.YELLOW
+        ),
+        (25, 125)
+    )
+    win.blit(
+        bsl_diff_hardness.render(
+            f'{d.BS_HARD[SETTINGS["language"]].title()}: {PARAMS["best_score"]["hard"]}', True, c.RED
+        ),
+        (400, 125)
+    )
 
     while game:  # game loop
         for event in pygame.event.get():
@@ -234,14 +268,22 @@ while loop:  # main loop
             win.blit(back, (0, 0))
 
             # formula for labels' y-cor is: start coordinate + wide between labels * (number of label - 1)
-            win.blit(label.render(f'{d.SKIPPED[SETTINGS["language"]].title()}: {skip_counter}', True, c.WHITE), (5, label_start_cor + labels_wide))
-            win.blit(label.render(f'{d.BEATEN[SETTINGS["language"]].title()}: {beaten_counter}', True, c.WHITE), (5, label_start_cor + labels_wide * 3))
-            win.blit(label.render(
-                f'{d.SHOTS[SETTINGS["language"]].title()}: {shot_counter}', True, c.WHITE), (5, label_start_cor + labels_wide * 2)
+            win.blit(
+                game_info_label.render(f'{d.SKIPPED[SETTINGS["language"]].title()}: {skip_counter}', True, c.WHITE),
+                (5, gil_start_cor + gil_wide)
+            )
+            win.blit(
+                game_info_label.render(f'{d.BEATEN[SETTINGS["language"]].title()}: {beaten_counter}', True, c.WHITE),
+                (5, gil_start_cor + gil_wide * 3)
+            )
+            win.blit(
+                game_info_label.render(f'{d.SHOTS[SETTINGS["language"]].title()}: {shot_counter}', True, c.WHITE),
+                (5, gil_start_cor + gil_wide * 2)
             )
             score = beaten_counter * 3 - skip_counter - shot_counter
-            win.blit(label.render(
-                f'{d.SCORE[SETTINGS["language"]].title()}: {score}', True, c.WHITE), (5, label_start_cor)
+            win.blit(
+                game_info_label.render(f'{d.SCORE[SETTINGS["language"]].title()}: {score}', True, c.WHITE),
+                (5, gil_start_cor)
             )
 
             player.draw(win)
