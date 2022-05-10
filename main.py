@@ -114,6 +114,7 @@ def get_hardness_color():
     else:  # hard
         return c.RED
 
+
 def change_hardness():
     """Changes hardness"""
     global SETTINGS
